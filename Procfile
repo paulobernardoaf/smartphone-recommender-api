@@ -1,1 +1,1 @@
-worker: python smartphoneRecommender.py
+web: gunicorn app:app

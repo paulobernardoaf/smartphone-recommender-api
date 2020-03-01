@@ -11,7 +11,7 @@ from flask import request
 
 import flask
 
-app = flask.Flask("smartphone-recommender-api")
+app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 lab_enc = LabelEncoder()
@@ -114,6 +114,10 @@ def phones():
     battery = request.args.get('battery')
     result = generate_result(screen, ram, storage, battery)
     return str(next(result).to_json(orient='records'))
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
 
 
 app.run()
