@@ -1,1 +1,1 @@
-web: python smartphoneRecommender.py
+worker: python smartphoneRecommender.py
