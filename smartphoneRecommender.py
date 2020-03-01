@@ -11,7 +11,7 @@ from flask import request
 
 import flask
 
-app = flask.Flask(__name__)
+app = flask.Flask("smartphone-recommender-api")
 app.config["DEBUG"] = True
 
 lab_enc = LabelEncoder()
