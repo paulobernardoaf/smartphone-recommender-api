@@ -101,7 +101,7 @@ def run_classifier(screen, ram, storage, battery):
     string = str(int(float(ram))) + " GB RAM | " + str(storage) + " GB ROM"
 
     phones = full_dataset.loc[full_dataset["Name"].str.contains(brand) & full_dataset["Storage_details"].str.contains(string) & (new_dataset["Screen_size"].apply(np.isclose, b=float(screen), atol=0.1) ) & (new_dataset["Battery_details"].apply(np.isclose, b=int(battery), atol=500))]
-    phones = phones.drop(columns=["ImageUrl", "Price in Rupees", "Camera_details", "Processor"])
+    phones = phones.drop(columns=["Price in Rupees", "Processor"])
 
     return phones
 
