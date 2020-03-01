@@ -9,6 +9,7 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from flask import request
 from flask_cors import CORS
+import json
 
 import flask
 
@@ -99,14 +100,26 @@ def run_classifier(screen, ram, storage, battery):
 
     string = str(int(float(ram))) + " GB RAM | " + str(storage) + " GB ROM"
 
-    phones = full_dataset.loc[full_dataset["Name"].str.contains(brand) & full_dataset["Storage_details"].str.contains(string) & (new_dataset["Screen_size"].apply(np.isclose, b=float(screen), atol=0.1) ) & full_dataset["Battery_details"].str.contains(str(battery))]
+    phones = full_dataset.loc[full_dataset["Name"].str.contains(brand) & full_dataset["Storage_details"].str.contains(string) & (new_dataset["Screen_size"].apply(np.isclose, b=float(screen), atol=0.1) ) & (new_dataset["Battery_details"].apply(np.isclose, b=int(battery), atol=500))]
     phones = phones.drop(columns=["ImageUrl", "Price in Rupees", "Camera_details", "Processor"])
 
     return phones
 
+def build_info():
+    new_dataset, y, colors = buildDataset(full_dataset)
+    screens = ["%.1f" % number for number in new_dataset["Screen_size"].unique()]
+    rams = ["%.1f" % number for number in new_dataset["Ram_storage"].unique()]
+    mems = new_dataset["Mem_storage"].unique()
+    batteries = new_dataset["Battery_details"].unique()
+
+    return list(dict.fromkeys(screens)), list(dict.fromkeys(rams)), mems, batteries
+
 
 def generate_result(screen, ram, storage, battery):
     yield run_classifier(screen, ram, storage, battery)
+
+def generate_info():
+    yield build_info()
 
 @app.route('/phones', methods=['GET'])
 def phones():
@@ -120,6 +133,15 @@ def phones():
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
+
+@app.route('/info')
+def info():
+    screens, rams, mems, batteries = next(generate_info())
+    screens.sort()
+    rams.sort()
+    batteries.sort()
+    mems.sort()
+    return str(json.dumps({"screens":screens,"rams": rams,"mems": mems.tolist(),"batteries": batteries.tolist()}))
 
 
 if __name__ == '__main__':
