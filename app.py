@@ -8,11 +8,13 @@ from sklearn_pandas import DataFrameMapper, gen_features
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from flask import request
+from flask_cors import CORS
 
 import flask
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+CORS(app)
 
 lab_enc = LabelEncoder()
 
