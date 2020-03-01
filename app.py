@@ -120,6 +120,6 @@ def hello_world():
     return 'Hello, World!'
 
 
-app.run()
+app.run(threaded=True, port=5000)
 
 
