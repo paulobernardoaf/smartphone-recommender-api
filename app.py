@@ -90,9 +90,8 @@ def run_classifier(screen, ram, storage, battery):
     result = cross_validate(lin, X, y, cv=10, scoring="accuracy", return_estimator=True)
 
     best_instance = np.argmax(result['test_score'])
-    best_classifier = result["estimator"][best_instance]
 
-    print(screen, ram, storage, battery)
+    best_classifier = result["estimator"][best_instance]
 
     prediction = best_classifier.predict(scaler.transform([[screen, battery, ram, storage]]))
 
@@ -103,7 +102,7 @@ def run_classifier(screen, ram, storage, battery):
     phones = full_dataset.loc[full_dataset["Name"].str.contains(brand) & full_dataset["Storage_details"].str.contains(string) & (new_dataset["Screen_size"].apply(np.isclose, b=float(screen), atol=0.1) ) & (new_dataset["Battery_details"].apply(np.isclose, b=int(battery), atol=500))]
     phones = phones.drop(columns=["Price in Rupees", "Processor"])
 
-    return phones
+    return phones, max(result['test_score']), brand
 
 def build_info():
     new_dataset, y, colors = buildDataset(full_dataset)
@@ -127,8 +126,8 @@ def phones():
     ram = request.args.get('ram')
     storage = request.args.get('storage')
     battery = request.args.get('battery')
-    result = generate_result(screen, ram, storage, battery)
-    return str(next(result).to_json(orient='records'))
+    result, accuracy, brand = next(generate_result(screen, ram, storage, battery))
+    return json.dumps({"phones": result.to_dict(orient='records'), "accuracy": accuracy, "brand": brand})
 
 @app.route('/')
 def hello_world():
@@ -141,7 +140,7 @@ def info():
     rams.sort()
     batteries.sort()
     mems.sort()
-    return str(json.dumps({"screens":screens,"rams": rams,"mems": mems.tolist(),"batteries": batteries.tolist()}))
+    return json.dumps({"screens":screens,"rams": rams,"mems": mems.tolist(),"batteries": batteries.tolist()})
 
 
 if __name__ == '__main__':
