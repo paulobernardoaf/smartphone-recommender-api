@@ -107,10 +107,10 @@ def run_classifier(screen, ram, storage, battery):
 def build_info():
     new_dataset, y, colors = buildDataset(full_dataset)
     screens = ["%.1f" % number for number in new_dataset["Screen_size"].unique()]
-    rams = ["%.1f" % number for number in new_dataset["Ram_storage"].unique()]
+    rams = np.array(["%.1f" % number for number in new_dataset["Ram_storage"].unique()], dtype=np.float32)
     mems = new_dataset["Mem_storage"].unique()
     batteries = new_dataset["Battery_details"].unique()
-
+    
     return list(dict.fromkeys(screens)), list(dict.fromkeys(rams)), mems, batteries
 
 
@@ -140,6 +140,7 @@ def info():
     rams.sort()
     batteries.sort()
     mems.sort()
+    rams = list(np.array(rams, dtype=np.str))   
     return json.dumps({"screens":screens,"rams": rams,"mems": mems.tolist(),"batteries": batteries.tolist()})
 
 
